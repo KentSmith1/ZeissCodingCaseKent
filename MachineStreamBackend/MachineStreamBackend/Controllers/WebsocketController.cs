@@ -7,50 +7,31 @@ namespace MachineStreamBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class WebsocketController : ControllerBase
+    public class WebsocketController : Controller
     {
         // GET: api/<WebsocketController>
         [HttpGet]
-        public List<MachineStreamResult> Get()
+        public List<MachineStreamResultPayload> Get()
         {
-            return WebsocketService.GetMachineStreamMessages();
+            return WebsocketService.GetPayloadMessages();
         }
 
         [HttpGet("{id}")]
-        public List<MachineStreamResult> GetMachine(string id)
+        public List<MachineStreamResultPayload> GetMachine(string id)
         {
-            return WebsocketService.GetMachineStreamMessagesByMachine(id);
+            return WebsocketService.GetPayloadMessagesByMachine(id);
+        }
+
+        [HttpGet("latest/{id}")]
+        public MachineStreamResultPayload GetLatestMachine(string id)
+        {
+            return WebsocketService.GetLatestPayloadMessagesByMachine(id);
         }
 
         [HttpGet("status/{id}")]
         public string GetMachineStatus(string id)
         {
-            return WebsocketService.GetMachineStatus(id);
+            return WebsocketService.GetLatestPayloadMessagesByMachine(id).Status;
         }
-
-        //// GET api/<WebsocketController>/5
-        //[HttpGet("{id}")]
-        //public string Get(int id)
-        //{
-        //    return "value";
-        //}
-
-        //// POST api/<WebsocketController>
-        //[HttpPost]
-        //public void Post([FromBody] string value)
-        //{
-        //}
-
-        //// PUT api/<WebsocketController>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
-
-        //// DELETE api/<WebsocketController>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
     }
 }

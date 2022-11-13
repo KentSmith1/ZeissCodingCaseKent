@@ -10,9 +10,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var app = builder.Build();
+//builder.Services.AddDbContext<MessagesContext>();
+//builder.Services.AddScoped<MessagesRepository>();
+//builder.Services.AddScoped<WebsocketService>();
+
 
 WebsocketService.StartWS();
+
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

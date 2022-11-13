@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+  machinestreambackend:
+    build: 
+      context: .
+      dockerfile: MachineStreamBackend/Dockerfile
+    ports:
+      - 5050:80

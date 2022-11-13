@@ -4,10 +4,11 @@ using System.Text;
 
 namespace MachineStreamBackend.Services
 {
-    static class WebsocketService
+    public static class WebsocketService
     {
         private static String connectionString = "ws://machinestream.herokuapp.com/ws";
         private static List<MachineStreamMessage> MessageList = new List<MachineStreamMessage>();
+        private static MessagesRepository messagesRepository = new MessagesRepository();
 
         public static async void StartWS()
         {
@@ -27,7 +28,6 @@ namespace MachineStreamBackend.Services
                         else
                         {
                             ProcessMessage(Encoding.ASCII.GetString(buffer, 0, result.Count));
-                            //Console.WriteLine(Encoding.ASCII.GetString(buffer, 0, result.Count));
                         }
                     }
                 }
@@ -50,38 +50,33 @@ namespace MachineStreamBackend.Services
                     Status = Enum.Parse<Status>(jsonMessage.GetValue("payload").Value<string>("status"))
                 }
             };
-            //Console.WriteLine(machineStreamMessage);
-            MessageList.Add(machineStreamMessage); 
+            messagesRepository.AddStreamMessagePayload(machineStreamMessage.Payload);
         }
 
-        public static List<MachineStreamResult> GetMachineStreamMessages()
+        public static List<MachineStreamResultPayload> GetPayloadMessages()
         {
-            var MachineStreamResults = new List<MachineStreamResult>();
-            MessageList.ForEach(m => MachineStreamResults.Add(new MachineStreamResult
+            return messagesRepository.GetStreamMessagePayloads().Select(x => MapPayload(x)).ToList();
+        }
+
+        public static List<MachineStreamResultPayload> GetPayloadMessagesByMachine(string id)
+        {
+            return messagesRepository.GetPayloadByMachineID(id).Select(x => MapPayload(x)).ToList();
+        }
+
+        public static MachineStreamResultPayload GetLatestPayloadMessagesByMachine(string id)
+        {
+            return MapPayload(messagesRepository.GetLatestPayloadByMachineID(id));
+        }
+
+        private static MachineStreamResultPayload MapPayload(StreamMessagePayload payload)
+        {
+            return new MachineStreamResultPayload
             {
-                Topic = m.Topic,
-                Ref = m.Ref,
-                Event = m.Event,
-                Payload = new MachineStreamResultPayload
-                {
-                    MachineID = m.Payload.MachineID,
-                    ID = m.Payload.ID,
-                    TimeStamp = m.Payload.TimeStamp,
-                    Status = m.Payload.Status.ToString()
-                }
-            }));
-            return MachineStreamResults;
-        }
-
-        public static List<MachineStreamResult> GetMachineStreamMessagesByMachine(string id)
-        {
-            return GetMachineStreamMessages().Where(x => x.Payload.MachineID == id).ToList();
-        }
-
-        public static string GetMachineStatus(string id)
-        {
-            var List = GetMachineStreamMessages();
-            return List.Where(x => x.Payload.MachineID == id && x.Payload.TimeStamp == List.Max(a => a.Payload.TimeStamp)).SingleOrDefault().Payload.Status;
+                ID = payload.ID,
+                MachineID = payload.MachineID,
+                TimeStamp = payload.TimeStamp,
+                Status = payload.Status.ToString()
+            };
         }
 
     }

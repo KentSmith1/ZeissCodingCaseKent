@@ -1,4 +1,6 @@
-﻿namespace MachineStreamBackend.Services
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MachineStreamBackend.Services
 {
     public class MachineStreamMessage
     {
@@ -10,9 +12,10 @@
     }
 
     public class StreamMessagePayload
-    {        
-        public String MachineID { get; set; }
-        public String ID { get; set; }  
+    {
+        [Key]
+        public String ID { get; set; }
+        public String MachineID { get; set; }        
         public DateTime TimeStamp { get; set; }
         public Status Status { get; set;  } 
     }
